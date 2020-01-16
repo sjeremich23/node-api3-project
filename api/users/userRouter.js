@@ -75,9 +75,19 @@ router.get("/:id", validateUserId, (req, res) => {
 router.get("/:id/posts", validateUserId, (req, res) => {
   const { id } = req.params;
 
-  Users.getUserPosts(id).then(posts => {
-    res.status(200).json({ posts });
-  });
+  Users.getUserPosts(id)
+    .then(posts => {
+      if (!posts.length > 0) {
+        res.status(400).json({ errorMessage: "This user has no posts" });
+      } else {
+        res.status(200).json({ posts });
+      }
+    })
+    .catch(err => {
+      res
+        .status(400)
+        .json({ err, error: "Cannot access Posts from database." });
+    });
 });
 
 router.delete("/:id", validateUserId, (req, res) => {
